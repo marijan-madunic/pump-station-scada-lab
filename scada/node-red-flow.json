@@ -1,0 +1,1065 @@
+[
+    {
+        "id": "9f14d142adfac103",
+        "type": "tab",
+        "label": "Pump Station SCADA Lab",
+        "disabled": false,
+        "info": "",
+        "env": []
+    },
+    {
+        "id": "e33170db3ac4f1e9",
+        "type": "group",
+        "z": "9f14d142adfac103",
+        "name": "PLC TELEMETRY PIPELINE (Modbus → MQTT)",
+        "style": {
+            "fill": "#bfdbef",
+            "label": true
+        },
+        "nodes": [
+            "915aa923b91c8824",
+            "7222515c36e62a70",
+            "0c34ba203ac4959f"
+        ],
+        "x": 74,
+        "y": 19,
+        "w": 812,
+        "h": 82,
+        "info": "Modbus → MQTT"
+    },
+    {
+        "id": "143291889811d927",
+        "type": "group",
+        "z": "9f14d142adfac103",
+        "name": "SCADA TELEMETRY PROCESSING (MQTT → Dashboard)",
+        "style": {
+            "fill": "#e3f3d3",
+            "label": true
+        },
+        "nodes": [
+            "462db65e5228351d",
+            "92ace2c221ac95a3",
+            "5f28c9bd509373ce",
+            "4cfeeeab2ba3b6b2",
+            "ed8a40a30cc9eeb8",
+            "8abc157e2910aec8",
+            "be8b8685378309dd",
+            "dd89bddd2a7cebfd",
+            "4ee28299d12321e3"
+        ],
+        "x": 74,
+        "y": 119,
+        "w": 1032,
+        "h": 242
+    },
+    {
+        "id": "4a68d165d53582ca",
+        "type": "group",
+        "z": "9f14d142adfac103",
+        "name": "PUMP CONTROL (SCADA → PLC Commands)",
+        "style": {
+            "fill": "#ffefbf",
+            "label": true
+        },
+        "nodes": [
+            "bea92f4ffb015721",
+            "e254110739e9ad7a",
+            "aa80ccec5abe08e9",
+            "c14b799c92c9152b",
+            "b4febf046d1da7e9",
+            "71b7f7d5abf46da2",
+            "b38cbd6f8bd7905a",
+            "33860b8c8109a08f",
+            "28168a7b3ce49526",
+            "296ea397a9a906b9"
+        ],
+        "x": 74,
+        "y": 379,
+        "w": 712,
+        "h": 322
+    },
+    {
+        "id": "c656f749c55d66ad",
+        "type": "group",
+        "z": "9f14d142adfac103",
+        "name": "ALARM MANAGEMENT (Event Detection + History)",
+        "style": {
+            "fill": "#ffbfbf",
+            "label": true
+        },
+        "nodes": [
+            "4a2187ec8535c62e",
+            "8bebbb5ed6e9f359",
+            "ec32e9ca0d573329",
+            "9afdb2035ca8f94e",
+            "149d3cfc6f42e202",
+            "2d676e350e49405a",
+            "06bf5d672393c9e1",
+            "8d803a3aa6ac7f0c",
+            "25462b533cfb3c1d"
+        ],
+        "x": 74,
+        "y": 819,
+        "w": 1292,
+        "h": 242
+    },
+    {
+        "id": "eddec4037b84307a",
+        "type": "group",
+        "z": "9f14d142adfac103",
+        "name": "PLC COMMUNICATION WATCHDOG (Heartbeat monitoring)",
+        "style": {
+            "fill": "#dbcbe7",
+            "label": true
+        },
+        "nodes": [
+            "60c7210d92405443",
+            "8fe8754fef9899eb",
+            "db72ceec12fbd6c1",
+            "a905147a96a3945e"
+        ],
+        "x": 74,
+        "y": 719,
+        "w": 1012,
+        "h": 82
+    },
+    {
+        "id": "915aa923b91c8824",
+        "type": "modbus-read",
+        "z": "9f14d142adfac103",
+        "g": "e33170db3ac4f1e9",
+        "name": "",
+        "topic": "",
+        "showStatusActivities": false,
+        "logIOActivities": false,
+        "showErrors": false,
+        "showWarnings": true,
+        "unitid": "1",
+        "dataType": "HoldingRegister",
+        "adr": "0",
+        "quantity": "8",
+        "rate": "2000",
+        "rateUnit": "ms",
+        "delayOnStart": false,
+        "enableDeformedMessages": false,
+        "startDelayTime": "",
+        "server": "955e30fbc3b7295f",
+        "useIOFile": false,
+        "ioFile": "",
+        "useIOForPayload": false,
+        "emptyMsgOnFail": false,
+        "x": 190,
+        "y": 60,
+        "wires": [
+            [
+                "7222515c36e62a70"
+            ],
+            []
+        ]
+    },
+    {
+        "id": "7222515c36e62a70",
+        "type": "function",
+        "z": "9f14d142adfac103",
+        "g": "e33170db3ac4f1e9",
+        "name": "Format PLC Telemetry",
+        "func": "let r = msg.payload.data || msg.payload;\n\nmsg.payload = JSON.stringify({\n    tank_level: r[0],\n    pump_cmd: r[1],\n    pump_status: r[2],\n    alarm_high: r[3],\n    alarm_low: r[4],\n    heartbeat: r[5],\n    auto_mode: r[6],\n    manual_cmd: r[7]\n});\n\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 480,
+        "y": 60,
+        "wires": [
+            [
+                "0c34ba203ac4959f"
+            ]
+        ]
+    },
+    {
+        "id": "0c34ba203ac4959f",
+        "type": "mqtt out",
+        "z": "9f14d142adfac103",
+        "g": "e33170db3ac4f1e9",
+        "name": "Publish Telemetry MQTT",
+        "topic": "plc/pump_station/telemetry",
+        "qos": "0",
+        "retain": "",
+        "respTopic": "",
+        "contentType": "",
+        "userProps": "",
+        "correl": "",
+        "expiry": "",
+        "broker": "6f71470b859e095b",
+        "x": 750,
+        "y": 60,
+        "wires": []
+    },
+    {
+        "id": "462db65e5228351d",
+        "type": "mqtt in",
+        "z": "9f14d142adfac103",
+        "g": "143291889811d927",
+        "name": "",
+        "topic": "plc/pump_station/telemetry",
+        "qos": "2",
+        "datatype": "auto-detect",
+        "broker": "6f71470b859e095b",
+        "nl": false,
+        "rap": true,
+        "rh": 0,
+        "inputs": 0,
+        "x": 210,
+        "y": 160,
+        "wires": [
+            [
+                "92ace2c221ac95a3"
+            ]
+        ]
+    },
+    {
+        "id": "5f28c9bd509373ce",
+        "type": "function",
+        "z": "9f14d142adfac103",
+        "g": "143291889811d927",
+        "name": "function (tank_level)",
+        "func": "msg.payload = msg.payload.tank_level;\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 720,
+        "y": 160,
+        "wires": [
+            [
+                "4cfeeeab2ba3b6b2",
+                "ed8a40a30cc9eeb8"
+            ]
+        ]
+    },
+    {
+        "id": "92ace2c221ac95a3",
+        "type": "json",
+        "z": "9f14d142adfac103",
+        "g": "143291889811d927",
+        "name": "",
+        "property": "payload",
+        "action": "obj",
+        "pretty": false,
+        "x": 410,
+        "y": 160,
+        "wires": [
+            [
+                "5f28c9bd509373ce",
+                "8abc157e2910aec8",
+                "be8b8685378309dd"
+            ]
+        ]
+    },
+    {
+        "id": "4cfeeeab2ba3b6b2",
+        "type": "ui_chart",
+        "z": "9f14d142adfac103",
+        "g": "143291889811d927",
+        "name": "",
+        "group": "6f93f6963171ebfa",
+        "order": 0,
+        "width": 0,
+        "height": 0,
+        "label": "chart",
+        "chartType": "line",
+        "legend": "false",
+        "xformat": "HH:mm:ss",
+        "interpolate": "linear",
+        "nodata": "",
+        "dot": false,
+        "ymin": "",
+        "ymax": "",
+        "removeOlder": 1,
+        "removeOlderPoints": "",
+        "removeOlderUnit": "3600",
+        "cutout": 0,
+        "useOneColor": false,
+        "useUTC": false,
+        "colors": [
+            "#1f77b4",
+            "#aec7e8",
+            "#ff7f0e",
+            "#2ca02c",
+            "#98df8a",
+            "#d62728",
+            "#ff9896",
+            "#9467bd",
+            "#c5b0d5"
+        ],
+        "outputs": 1,
+        "useDifferentColor": false,
+        "className": "",
+        "x": 990,
+        "y": 160,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "ed8a40a30cc9eeb8",
+        "type": "ui_gauge",
+        "z": "9f14d142adfac103",
+        "g": "143291889811d927",
+        "name": "",
+        "group": "6f93f6963171ebfa",
+        "order": 1,
+        "width": 0,
+        "height": 0,
+        "gtype": "gage",
+        "title": "Tank Level",
+        "label": "%",
+        "format": "{{value}}",
+        "min": 0,
+        "max": "100",
+        "colors": [
+            "#00b500",
+            "#e6e600",
+            "#ca3838"
+        ],
+        "seg1": "60",
+        "seg2": "80",
+        "diff": false,
+        "className": "",
+        "x": 1010,
+        "y": 200,
+        "wires": []
+    },
+    {
+        "id": "8abc157e2910aec8",
+        "type": "function",
+        "z": "9f14d142adfac103",
+        "g": "143291889811d927",
+        "name": "function (pump_status)",
+        "func": "if (msg.payload.pump_status == 1) {\n    msg.payload = \"Pump ON\";\n    msg.color = \"green\";\n} else {\n    msg.payload = \"Pump OFF\";\n    msg.color = \"red\";\n}\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 720,
+        "y": 260,
+        "wires": [
+            [
+                "dd89bddd2a7cebfd"
+            ]
+        ]
+    },
+    {
+        "id": "be8b8685378309dd",
+        "type": "function",
+        "z": "9f14d142adfac103",
+        "g": "143291889811d927",
+        "name": "function (alarm_status)",
+        "func": "if (msg.payload.alarm_high == 1) {\n    msg.payload = \"HIGH LEVEL ALARM\";\n    msg.color = \"#d50000\";\n} else if (msg.payload.alarm_low == 1) {\n    msg.payload = \"LOW LEVEL ALARM\";\n    msg.color = \"#ff6d00\";\n} else {\n    msg.payload = \"Normal\";\n    msg.color = \"#00c853\";\n}\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 720,
+        "y": 320,
+        "wires": [
+            [
+                "4ee28299d12321e3"
+            ]
+        ]
+    },
+    {
+        "id": "dd89bddd2a7cebfd",
+        "type": "ui_template",
+        "z": "9f14d142adfac103",
+        "g": "143291889811d927",
+        "group": "6f93f6963171ebfa",
+        "name": "",
+        "order": 4,
+        "width": "6",
+        "height": "1",
+        "format": "<div style=\"font-size:20px; font-weight:bold; color:{{msg.color}};\">\n    {{msg.payload}}\n</div>",
+        "storeOutMessages": true,
+        "fwdInMessages": true,
+        "resendOnRefresh": true,
+        "templateScope": "local",
+        "className": "",
+        "x": 1000,
+        "y": 260,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "4ee28299d12321e3",
+        "type": "ui_template",
+        "z": "9f14d142adfac103",
+        "g": "143291889811d927",
+        "group": "6f93f6963171ebfa",
+        "name": "",
+        "order": 4,
+        "width": "6",
+        "height": "1",
+        "format": "<div style=\"font-size:20px; font-weight:bold; color:{{msg.color}}\">\n    {{msg.payload}}\n</div>",
+        "storeOutMessages": true,
+        "fwdInMessages": true,
+        "resendOnRefresh": true,
+        "templateScope": "local",
+        "className": "",
+        "x": 1000,
+        "y": 320,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "e254110739e9ad7a",
+        "type": "ui_button",
+        "z": "9f14d142adfac103",
+        "g": "4a68d165d53582ca",
+        "name": "",
+        "group": "6f93f6963171ebfa",
+        "order": 5,
+        "width": "6",
+        "height": "1",
+        "passthru": false,
+        "label": "Pump ON",
+        "tooltip": "",
+        "color": "",
+        "bgcolor": "",
+        "className": "",
+        "icon": "",
+        "payload": "ON",
+        "payloadType": "str",
+        "topic": "plc/cmd/pump",
+        "topicType": "str",
+        "x": 160,
+        "y": 580,
+        "wires": [
+            [
+                "b4febf046d1da7e9"
+            ]
+        ]
+    },
+    {
+        "id": "aa80ccec5abe08e9",
+        "type": "ui_button",
+        "z": "9f14d142adfac103",
+        "g": "4a68d165d53582ca",
+        "name": "",
+        "group": "6f93f6963171ebfa",
+        "order": 4,
+        "width": "6",
+        "height": "1",
+        "passthru": false,
+        "label": "Pump OFF",
+        "tooltip": "",
+        "color": "",
+        "bgcolor": "",
+        "className": "",
+        "icon": "",
+        "payload": "OFF",
+        "payloadType": "str",
+        "topic": "plc/cmd/pump",
+        "topicType": "str",
+        "x": 170,
+        "y": 620,
+        "wires": [
+            [
+                "b4febf046d1da7e9"
+            ]
+        ]
+    },
+    {
+        "id": "b4febf046d1da7e9",
+        "type": "mqtt out",
+        "z": "9f14d142adfac103",
+        "g": "4a68d165d53582ca",
+        "name": "",
+        "topic": "",
+        "qos": "",
+        "retain": "",
+        "respTopic": "",
+        "contentType": "",
+        "userProps": "",
+        "correl": "",
+        "expiry": "",
+        "broker": "6f71470b859e095b",
+        "x": 410,
+        "y": 580,
+        "wires": []
+    },
+    {
+        "id": "bea92f4ffb015721",
+        "type": "mqtt in",
+        "z": "9f14d142adfac103",
+        "g": "4a68d165d53582ca",
+        "name": "",
+        "topic": "plc/pump_station/cmd/pump",
+        "qos": "2",
+        "datatype": "auto-detect",
+        "broker": "6f71470b859e095b",
+        "nl": false,
+        "rap": true,
+        "rh": 0,
+        "inputs": 0,
+        "x": 220,
+        "y": 420,
+        "wires": [
+            [
+                "71b7f7d5abf46da2"
+            ]
+        ]
+    },
+    {
+        "id": "71b7f7d5abf46da2",
+        "type": "function",
+        "z": "9f14d142adfac103",
+        "g": "4a68d165d53582ca",
+        "name": "pump_cmd",
+        "func": "let cmd = String(msg.payload).trim();\n\nlet auto_mode = 0;\nlet manual_cmd = 0;\n\nif (cmd === \"ON\") {\n    manual_cmd = 1;\n} else if (cmd === \"OFF\") {\n    manual_cmd = 0;\n} else {\n    return null;\n}\n\nlet msg1 = {\n    payload: {\n        value: auto_mode,\n        fc: 6,\n        unitid: 1,\n        address: 6,\n        quantity: 1\n    }\n};\n\nlet msg2 = {\n    payload: {\n        value: manual_cmd,\n        fc: 6,\n        unitid: 1,\n        address: 7,\n        quantity: 1\n    }\n};\n\nreturn [msg1, msg2];",
+        "outputs": 2,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 430,
+        "y": 420,
+        "wires": [
+            [
+                "28168a7b3ce49526",
+                "296ea397a9a906b9"
+            ],
+            []
+        ]
+    },
+    {
+        "id": "28168a7b3ce49526",
+        "type": "modbus-flex-write",
+        "z": "9f14d142adfac103",
+        "g": "4a68d165d53582ca",
+        "name": "auto_mode",
+        "showStatusActivities": false,
+        "showErrors": false,
+        "showWarnings": true,
+        "server": "955e30fbc3b7295f",
+        "emptyMsgOnFail": false,
+        "keepMsgProperties": false,
+        "delayOnStart": false,
+        "startDelayTime": "",
+        "x": 690,
+        "y": 420,
+        "wires": [
+            [],
+            []
+        ]
+    },
+    {
+        "id": "296ea397a9a906b9",
+        "type": "modbus-flex-write",
+        "z": "9f14d142adfac103",
+        "g": "4a68d165d53582ca",
+        "name": "manual_cmd",
+        "showStatusActivities": false,
+        "showErrors": false,
+        "showWarnings": true,
+        "server": "955e30fbc3b7295f",
+        "emptyMsgOnFail": false,
+        "keepMsgProperties": false,
+        "delayOnStart": false,
+        "startDelayTime": "",
+        "x": 690,
+        "y": 520,
+        "wires": [
+            [],
+            []
+        ]
+    },
+    {
+        "id": "60c7210d92405443",
+        "type": "mqtt in",
+        "z": "9f14d142adfac103",
+        "g": "eddec4037b84307a",
+        "name": "",
+        "topic": "plc/pump_station/telemetry",
+        "qos": "2",
+        "datatype": "auto-detect",
+        "broker": "6f71470b859e095b",
+        "nl": false,
+        "rap": true,
+        "rh": 0,
+        "inputs": 0,
+        "x": 210,
+        "y": 760,
+        "wires": [
+            [
+                "8fe8754fef9899eb"
+            ]
+        ]
+    },
+    {
+        "id": "8fe8754fef9899eb",
+        "type": "trigger",
+        "z": "9f14d142adfac103",
+        "g": "eddec4037b84307a",
+        "name": "",
+        "op1": "COMMS OK",
+        "op2": "COMMS LOST",
+        "op1type": "str",
+        "op2type": "str",
+        "duration": "10",
+        "extend": true,
+        "overrideDelay": false,
+        "units": "s",
+        "reset": "",
+        "bytopic": "all",
+        "topic": "topic",
+        "outputs": 1,
+        "x": 430,
+        "y": 760,
+        "wires": [
+            [
+                "db72ceec12fbd6c1"
+            ]
+        ]
+    },
+    {
+        "id": "db72ceec12fbd6c1",
+        "type": "function",
+        "z": "9f14d142adfac103",
+        "g": "eddec4037b84307a",
+        "name": "comms_status",
+        "func": "if (msg.payload === \"COMMS LOST\") {\n    msg.payload = \"COMMUNICATION LOST\";\n    msg.color = \"#d50000\";\n} else {\n    msg.payload = \"COMMS OK\";\n    msg.color = \"#00c853\";\n}\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 700,
+        "y": 760,
+        "wires": [
+            [
+                "a905147a96a3945e"
+            ]
+        ]
+    },
+    {
+        "id": "a905147a96a3945e",
+        "type": "ui_template",
+        "z": "9f14d142adfac103",
+        "g": "eddec4037b84307a",
+        "group": "6f93f6963171ebfa",
+        "name": "",
+        "order": 6,
+        "width": "6",
+        "height": "1",
+        "format": "<div style=\"font-size:20px; font-weight:bold; color:{{msg.color}}\">\n    {{msg.payload}}\n</div>",
+        "storeOutMessages": true,
+        "fwdInMessages": true,
+        "resendOnRefresh": true,
+        "templateScope": "local",
+        "className": "",
+        "x": 1000,
+        "y": 760,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "c14b799c92c9152b",
+        "type": "ui_button",
+        "z": "9f14d142adfac103",
+        "g": "4a68d165d53582ca",
+        "name": "",
+        "group": "6f93f6963171ebfa",
+        "order": 7,
+        "width": "6",
+        "height": "1",
+        "passthru": false,
+        "label": "AUTO MODE",
+        "tooltip": "",
+        "color": "",
+        "bgcolor": "",
+        "className": "",
+        "icon": "",
+        "payload": "AUTO",
+        "payloadType": "str",
+        "topic": "plc/cmd/mode",
+        "topicType": "str",
+        "x": 180,
+        "y": 660,
+        "wires": [
+            [
+                "b4febf046d1da7e9"
+            ]
+        ]
+    },
+    {
+        "id": "b38cbd6f8bd7905a",
+        "type": "mqtt in",
+        "z": "9f14d142adfac103",
+        "g": "4a68d165d53582ca",
+        "name": "",
+        "topic": "plc/pump_station/cmd/mode",
+        "qos": "2",
+        "datatype": "auto-detect",
+        "broker": "6f71470b859e095b",
+        "nl": false,
+        "rap": true,
+        "rh": 0,
+        "inputs": 0,
+        "x": 220,
+        "y": 520,
+        "wires": [
+            [
+                "33860b8c8109a08f"
+            ]
+        ]
+    },
+    {
+        "id": "33860b8c8109a08f",
+        "type": "function",
+        "z": "9f14d142adfac103",
+        "g": "4a68d165d53582ca",
+        "name": "mode_cmd",
+        "func": "let cmd = String(msg.payload).trim();\n\nif (cmd !== \"AUTO\") {\n    return null;\n}\n\nlet msg1 = {\n    payload: {\n        value: 1,\n        fc: 6,\n        unitid: 1,\n        address: 6,\n        quantity: 1\n    }\n};\n\nlet msg2 = {\n    payload: {\n        value: 0,\n        fc: 6,\n        unitid: 1,\n        address: 7,\n        quantity: 1\n    }\n};\n\nreturn [msg1, msg2];",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 430,
+        "y": 520,
+        "wires": [
+            [
+                "28168a7b3ce49526",
+                "296ea397a9a906b9"
+            ]
+        ]
+    },
+    {
+        "id": "149d3cfc6f42e202",
+        "type": "ui_table",
+        "z": "9f14d142adfac103",
+        "g": "c656f749c55d66ad",
+        "group": "6f93f6963171ebfa",
+        "name": "ui_table",
+        "order": 8,
+        "width": "6",
+        "height": "4",
+        "columns": [
+            {
+                "field": "time",
+                "title": "time",
+                "width": "",
+                "align": "left",
+                "formatter": "plaintext",
+                "formatterParams": {
+                    "target": "_blank"
+                }
+            },
+            {
+                "field": "alarm",
+                "title": "alarm",
+                "width": "",
+                "align": "left",
+                "formatter": "plaintext",
+                "formatterParams": {
+                    "target": "_blank"
+                }
+            },
+            {
+                "field": "severity",
+                "title": "severity",
+                "width": "",
+                "align": "left",
+                "formatter": "html",
+                "formatterParams": {
+                    "target": "_blank"
+                }
+            }
+        ],
+        "outputs": 0,
+        "cts": false,
+        "x": 1280,
+        "y": 860,
+        "wires": []
+    },
+    {
+        "id": "8bebbb5ed6e9f359",
+        "type": "function",
+        "z": "9f14d142adfac103",
+        "g": "c656f749c55d66ad",
+        "name": "detect_events",
+        "func": "let p = msg.payload;\n\nif (typeof p === \"string\") {\n    p = JSON.parse(p);\n}\n\nlet prevLow = context.get(\"prevLow\") || 0;\nlet prevHigh = context.get(\"prevHigh\") || 0;\n\nlet events = [];\n\nif (p.alarm_low === 1 && prevLow === 0) {\n    events.push({\n        event: \"LOW LEVEL ALARM\",\n        severity: \"WARN\"\n    });\n}\n\nif (p.alarm_high === 1 && prevHigh === 0) {\n    events.push({\n        event: \"HIGH LEVEL ALARM\",\n        severity: \"WARN\"\n    });\n}\n\ncontext.set(\"prevLow\", p.alarm_low);\ncontext.set(\"prevHigh\", p.alarm_high);\n\nif (events.length === 0) {\n    return null;\n}\n\nmsg.payload = events;\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 440,
+        "y": 860,
+        "wires": [
+            [
+                "ec32e9ca0d573329"
+            ]
+        ]
+    },
+    {
+        "id": "4a2187ec8535c62e",
+        "type": "mqtt in",
+        "z": "9f14d142adfac103",
+        "g": "c656f749c55d66ad",
+        "name": "",
+        "topic": "plc/pump_station/telemetry",
+        "qos": "2",
+        "datatype": "auto-detect",
+        "broker": "6f71470b859e095b",
+        "nl": false,
+        "rap": true,
+        "rh": 0,
+        "inputs": 0,
+        "x": 210,
+        "y": 860,
+        "wires": [
+            [
+                "8bebbb5ed6e9f359",
+                "2d676e350e49405a",
+                "25462b533cfb3c1d"
+            ]
+        ]
+    },
+    {
+        "id": "ec32e9ca0d573329",
+        "type": "function",
+        "z": "9f14d142adfac103",
+        "g": "c656f749c55d66ad",
+        "name": "format_log_row",
+        "func": "let events = msg.payload;\n\nif (!Array.isArray(events)) {\n    events = [events];\n}\n\nlet rows = events.map(e => {\n    return {\n        time: new Date().toLocaleString(),\n        alarm: e.event,\n        severity: e.severity || \"WARN\"\n    };\n});\n\nmsg.payload = rows;\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 700,
+        "y": 860,
+        "wires": [
+            [
+                "9afdb2035ca8f94e"
+            ]
+        ]
+    },
+    {
+        "id": "2d676e350e49405a",
+        "type": "trigger",
+        "z": "9f14d142adfac103",
+        "g": "c656f749c55d66ad",
+        "name": "",
+        "op1": "",
+        "op2": "COMMS LOST",
+        "op1type": "nul",
+        "op2type": "str",
+        "duration": "10",
+        "extend": true,
+        "overrideDelay": false,
+        "units": "s",
+        "reset": "",
+        "bytopic": "all",
+        "topic": "topic",
+        "outputs": 1,
+        "x": 430,
+        "y": 920,
+        "wires": [
+            [
+                "06bf5d672393c9e1"
+            ]
+        ]
+    },
+    {
+        "id": "06bf5d672393c9e1",
+        "type": "function",
+        "z": "9f14d142adfac103",
+        "g": "c656f749c55d66ad",
+        "name": "comms_lost",
+        "func": "let wasLost = flow.get(\"comms_lost_state\") || false;\n\nif (!wasLost) {\n    flow.set(\"comms_lost_state\", true);\n    msg.payload = [{\n        event: \"COMMUNICATION LOST\",\n        severity: \"ERROR\"\n    }];\n    return msg;\n}\n\nreturn null;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 690,
+        "y": 920,
+        "wires": [
+            [
+                "8d803a3aa6ac7f0c"
+            ]
+        ]
+    },
+    {
+        "id": "8d803a3aa6ac7f0c",
+        "type": "function",
+        "z": "9f14d142adfac103",
+        "g": "c656f749c55d66ad",
+        "name": "format_log_row",
+        "func": "let events = msg.payload;\n\nif (!Array.isArray(events)) {\n    events = [events];\n}\n\nlet rows = events.map(e => {\n    let sev = e.severity || \"WARN\";\n    let color = \"black\";\n\n    if (sev === \"ERROR\") {\n        color = \"red\";\n    } else if (sev === \"WARN\") {\n        color = \"orange\";\n    } else if (sev === \"INFO\") {\n        color = \"blue\";\n    }\n\n    return {\n        time: new Date().toLocaleString(),\n        alarm: e.event,\n        severity: `<span style=\"color:${color}; font-weight:bold;\">${sev}</span>`\n    };\n});\n\nmsg.payload = rows;\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 920,
+        "y": 920,
+        "wires": [
+            [
+                "9afdb2035ca8f94e"
+            ]
+        ]
+    },
+    {
+        "id": "9afdb2035ca8f94e",
+        "type": "function",
+        "z": "9f14d142adfac103",
+        "g": "c656f749c55d66ad",
+        "name": "append_log",
+        "func": "let newRows = msg.payload;\n\n// ako slučajno dođe jedan objekt umjesto array-a\nif (!Array.isArray(newRows)) {\n    newRows = [newRows];\n}\n\n// uzmi postojeći log iz flow contexta\nlet logs = flow.get(\"alarm_logs\") || [];\n\n// dodaj nove redove na početak\nlogs = newRows.concat(logs);\n\n// ograniči na zadnjih 50 zapisa\nif (logs.length > 50) {\n    logs = logs.slice(0, 50);\n}\n\n// spremi natrag\nflow.set(\"alarm_logs\", logs);\n\n// pošalji cijelu listu tablici\nmsg.payload = logs;\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1110,
+        "y": 860,
+        "wires": [
+            [
+                "149d3cfc6f42e202"
+            ]
+        ]
+    },
+    {
+        "id": "25462b533cfb3c1d",
+        "type": "function",
+        "z": "9f14d142adfac103",
+        "g": "c656f749c55d66ad",
+        "name": "comms_restored",
+        "func": "let wasLost = flow.get(\"comms_lost_state\") || false;\n\nif (wasLost) {\n\n    // resetiraj stanje\n    flow.set(\"comms_lost_state\", false);\n\n    msg.payload = [{\n        event: \"COMMUNICATION RESTORED\",\n        severity: \"INFO\"\n    }];\n\n    return msg;\n}\n\nreturn null;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 470,
+        "y": 1020,
+        "wires": [
+            [
+                "8d803a3aa6ac7f0c"
+            ]
+        ]
+    },
+    {
+        "id": "955e30fbc3b7295f",
+        "type": "modbus-client",
+        "name": "",
+        "clienttype": "tcp",
+        "bufferCommands": true,
+        "stateLogEnabled": false,
+        "queueLogEnabled": false,
+        "failureLogEnabled": true,
+        "tcpHost": "192.168.208.130",
+        "tcpPort": "5020",
+        "tcpType": "DEFAULT",
+        "serialPort": "/dev/ttyUSB",
+        "serialType": "RTU-BUFFERD",
+        "serialBaudrate": 9600,
+        "serialDatabits": 8,
+        "serialStopbits": 1,
+        "serialParity": "none",
+        "serialConnectionDelay": 100,
+        "serialAsciiResponseStartDelimiter": "0x3A",
+        "unit_id": 1,
+        "commandDelay": 1,
+        "clientTimeout": 1000,
+        "reconnectOnTimeout": true,
+        "reconnectTimeout": 2000,
+        "parallelUnitIdsAllowed": true,
+        "showErrors": false,
+        "showWarnings": true,
+        "showLogs": true
+    },
+    {
+        "id": "6f71470b859e095b",
+        "type": "mqtt-broker",
+        "name": "mqtt-broker",
+        "broker": "localhost",
+        "port": 1883,
+        "clientid": "",
+        "autoConnect": true,
+        "usetls": false,
+        "protocolVersion": 4,
+        "keepalive": 60,
+        "cleansession": true,
+        "autoUnsubscribe": true,
+        "birthTopic": "",
+        "birthQos": "0",
+        "birthRetain": "false",
+        "birthPayload": "",
+        "birthMsg": {},
+        "closeTopic": "",
+        "closeQos": "0",
+        "closeRetain": "false",
+        "closePayload": "",
+        "closeMsg": {},
+        "willTopic": "",
+        "willQos": "0",
+        "willRetain": "false",
+        "willPayload": "",
+        "willMsg": {},
+        "userProps": "",
+        "sessionExpiry": ""
+    },
+    {
+        "id": "6f93f6963171ebfa",
+        "type": "ui_group",
+        "name": "Pump Station",
+        "tab": "9c0bd2ccf8ed1c43",
+        "order": 1,
+        "disp": true,
+        "width": 6,
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "9c0bd2ccf8ed1c43",
+        "type": "ui_tab",
+        "name": "SCADA",
+        "icon": "dashboard",
+        "disabled": false,
+        "hidden": false
+    },
+    {
+        "id": "80411b992aacc4a3",
+        "type": "global-config",
+        "env": [],
+        "modules": {
+            "node-red-contrib-modbus": "5.45.2",
+            "node-red-dashboard": "3.6.6",
+            "node-red-node-ui-table": "0.4.5"
+        }
+    }
+]

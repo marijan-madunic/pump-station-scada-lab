@@ -1,0 +1,25 @@
++-------------------+
+|   PLC Simulator   |
+|   (pymodbus)      |
++-------------------+
+        │
+        │ Modbus TCP
+        ▼
++-------------------+
+|   Node-RED        |
+|   Modbus Client   |
++-------------------+
+        │
+        │ MQTT publish
+        ▼
++-------------------+
+|   MQTT Broker     |
+|   Mosquitto       |
++-------------------+
+        │
+        │ telemetry
+        ▼
++-------------------+
+|   SCADA Dashboard |
+|   Node-RED UI     |
++-------------------+
