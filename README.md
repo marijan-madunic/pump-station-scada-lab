@@ -1,7 +1,5 @@
 # Pump Station SCADA Lab
 
-# Pump Station SCADA Lab
-
 ![Python](https://img.shields.io/badge/Python-3.x-blue)
 ![Node-RED](https://img.shields.io/badge/Node--RED-SCADA-red)
 ![Modbus](https://img.shields.io/badge/Protocol-Modbus%20TCP-green)
@@ -76,6 +74,7 @@ Dashboard features:
 
 ## Repository Structure
 
+```
 pump-station-scada-lab
 │
 ├── docs
@@ -93,7 +92,7 @@ pump-station-scada-lab
 │
 ├── README.md
 └── .gitignore
-
+```
 
 ---
 
